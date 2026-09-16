@@ -4,12 +4,11 @@ import sys
 from pathlib import Path
 
 # helpers
-def sanity_check(cmd) -> bool:
-	if shutil.which(cmd, mode=os.F_OK | os.X_OK, path=None) == None:
+def sanity_check(cmd) -> str | None:
+	found = shutil.which(cmd, mode=os.F_OK | os.X_OK, path=None)
+	if found == None:
 		print(f"Missing {cmd} or venv with {cmd}.")
-		return False
-	else:
-		return True
+	return found
 
 
 # shorter to write
@@ -33,8 +32,11 @@ def user_cache_dir() -> Path:
 
 # early bail if ruff isn't in $PATH
 # could add other tools here...
-if sanity_check("ruff") == False:
+ruff_path = sanity_check("ruff")
+if ruff_path == None:
 	_err()
+
+print(f"Using ruff at {ruff_path}.")
 
 # consts/vars
 cache_dir = user_cache_dir().as_posix()
